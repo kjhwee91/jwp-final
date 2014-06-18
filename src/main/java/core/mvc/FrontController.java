@@ -44,6 +44,7 @@ public class FrontController extends HttpServlet {
 	void movePage(HttpServletRequest req, HttpServletResponse resp,
 			String viewName) throws ServletException, IOException {
 		if (viewName.startsWith(DEFAULT_API_PREFIX)) {
+			// /api/addanswer.next
 			return;
 		}
 		

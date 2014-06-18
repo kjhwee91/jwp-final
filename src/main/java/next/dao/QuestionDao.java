@@ -8,10 +8,32 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import next.model.Answer;
 import next.model.Question;
 import next.support.db.ConnectionManager;
 
 public class QuestionDao {
+
+	public void updateAnswerCount(Answer answer) throws SQLException {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		try {
+			con = ConnectionManager.getConnection();
+			String sql = "update QUESTIONS set countOfComment = countOfComment + 1 where questionId = ? ";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setLong(1, answer.getQuestionId());
+			pstmt.executeUpdate();
+			System.out.println("save complete");
+		} finally {
+			if (pstmt != null) {
+				pstmt.close();
+			}
+
+			if (con != null) {
+				con.close();
+			}
+		}			
+	}
 
 	public void insert(Question question) throws SQLException {
 		Connection con = null;

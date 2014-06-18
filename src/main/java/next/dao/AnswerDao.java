@@ -12,7 +12,7 @@ import next.model.Answer;
 import next.support.db.ConnectionManager;
 
 public class AnswerDao {
-
+	
 	public void insert(Answer answer) throws SQLException {
 		Connection con = null;
 		PreparedStatement pstmt = null;
