@@ -59,19 +59,38 @@ public class QuestionDao {
 			}
 		}		
 	}
-
-	public List<Question> findAll() throws SQLException {
+	
+	public ResultSet connection(String sql) throws SQLException{
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
 			con = ConnectionManager.getConnection();
-			String sql = "SELECT questionId, writer, title, createdDate, countOfComment FROM QUESTIONS " + 
-					"order by questionId desc";
 			pstmt = con.prepareStatement(sql);
-
 			rs = pstmt.executeQuery();
+			return rs;
+		} finally {
+			if (rs != null) {
+				rs.close();
+			}
+			if (pstmt != null) {
+				pstmt.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		}
+	}
+	
 
+	public List<Question> findAll() throws SQLException {
+		String sql = "SELECT questionId, writer, title, createdDate, countOfComment FROM QUESTIONS " + 
+				"order by questionId desc";
+		Connection con = ConnectionManager.getConnection();
+		PreparedStatement pstmt = con.prepareStatement(sql);
+		ResultSet rs = pstmt.executeQuery();
+
+		try{
 			List<Question> questions = new ArrayList<Question>();
 			Question question = null;
 			while (rs.next()) {
@@ -87,30 +106,32 @@ public class QuestionDao {
 
 			return questions;
 		} finally {
-			if (rs != null) {
-				rs.close();
-			}
-			if (pstmt != null) {
-				pstmt.close();
-			}
-			if (con != null) {
-				con.close();
-			}
+			finalConnection(con, pstmt, rs);
+		}
+ 		
+	}
+	
+	public void finalConnection(Connection con, PreparedStatement pstmt, ResultSet rs) throws SQLException{
+		if (rs != null) {
+			rs.close();
+		}
+		if (pstmt != null) {
+			pstmt.close();
+		}
+		if (con != null) {
+			con.close();
 		}
 	}
 
 	public Question findById(long questionId) throws SQLException {
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try {
-			con = ConnectionManager.getConnection();
-			String sql = "SELECT questionId, writer, title, contents, createdDate, countOfComment FROM QUESTIONS " + 
-					"WHERE questionId = ?";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setLong(1, questionId);
+		String sql = "SELECT questionId, writer, title, contents, createdDate, countOfComment FROM QUESTIONS " + 
+				"WHERE questionId = ?";
 
-			rs = pstmt.executeQuery();
+		Connection con = ConnectionManager.getConnection();
+		PreparedStatement pstmt = con.prepareStatement(sql);
+		ResultSet rs = pstmt.executeQuery();
+		try {
+			pstmt.setLong(1, questionId);
 
 			Question question = null;
 			if (rs.next()) {
@@ -125,15 +146,7 @@ public class QuestionDao {
 
 			return question;
 		} finally {
-			if (rs != null) {
-				rs.close();
-			}
-			if (pstmt != null) {
-				pstmt.close();
-			}
-			if (con != null) {
-				con.close();
-			}
-		}
+			finalConnection(con, pstmt, rs);
+}
 	}
 }
